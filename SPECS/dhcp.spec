@@ -12,11 +12,14 @@
 #global patchver P1
 %global DHCPVERSION %{version}%{?prever}%{?patchver:-%{patchver}}
 
+# bind has changed ABI with CVE-2023-50387 fixes. Require compatible build
+%global BIND_MINVER 9.11.36-14
+
 
 Summary:              Dynamic host configuration protocol software
 Name:                 dhcp
 Version:              4.3.6
-Release:              49%{?dist}.1
+Release:              50%{?dist}
 # NEVER CHANGE THE EPOCH on this package.  The previous maintainer (prior to
 # dcantrell maintaining the package) made incorrect use of the epoch and
 # that's why it is at 12 now.  It should have never been used, but it was.
@@ -97,7 +100,7 @@ BuildRequires:        openldap-devel
 BuildRequires:        krb5-devel
 BuildRequires:        libcap-ng-devel
 # https://fedorahosted.org/fpc/ticket/502#comment:3
-BuildRequires:        bind-export-devel >= 9.11.11
+BuildRequires:        bind-export-devel >= %{BIND_MINVER}
 BuildRequires:        systemd systemd-devel
 # dhcp-sd_notify.patch
 BuildRequires:        pkgconfig(libsystemd)
@@ -122,6 +125,7 @@ DHCP (Dynamic Host Configuration Protocol)
 Summary:              Provides the ISC DHCP server
 Requires:             %{name}-common = %{epoch}:%{version}-%{release}
 Requires:             %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires:             bind-export-libs >= %{BIND_MINVER}
 Requires(pre): shadow-utils
 Requires(post): coreutils grep sed
 Requires(post): systemd
@@ -141,6 +145,7 @@ This package provides the ISC DHCP server.
 Summary:              Provides the ISC DHCP relay agent
 Requires:             %{name}-common = %{epoch}:%{version}-%{release}
 Requires:             %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires:             bind-export-libs >= %{BIND_MINVER}
 Requires(post): grep sed
 Requires(post): systemd
 Requires(preun): systemd
@@ -163,6 +168,7 @@ Obsoletes:            dhclient < %{epoch}:%{version}-%{release}
 Requires:             coreutils gawk grep ipcalc iproute iputils sed systemd
 Requires:             %{name}-common = %{epoch}:%{version}-%{release}
 Requires:             %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires:             bind-export-libs >= %{BIND_MINVER}
 
 %description client
 DHCP (Dynamic Host Configuration Protocol) is a protocol which allows
@@ -714,10 +720,10 @@ done
 %endif
 
 %changelog
-* Thu Apr 11 2024 Release Engineering <releng@rockylinux.org> - 4.3.6-49
+* Tue Apr 16 2024 Release Engineering <releng@rockylinux.org> - 4.3.6-50
 - Change bug tracker path
 
-* Tue Mar 05 2024 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-49.1
+* Tue Mar 05 2024 Petr Menšík <pemensik@redhat.com> - 12:4.3.6-50
 - Rebuild because of bind ABI changes related to CVE-2023-50387
 
 * Tue Oct 11 2022 Martin Osvald <mosvald@redhat.com> - 12:4.3.6-49
